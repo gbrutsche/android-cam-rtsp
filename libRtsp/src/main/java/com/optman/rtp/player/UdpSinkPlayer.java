@@ -7,14 +7,11 @@ import com.google.android.exoplayer.VideoSurfaceView;
 import com.optman.rtp.receiver.RtpAacStream;
 import com.optman.rtp.receiver.RtpAvcStream;
 import com.optman.rtp.receiver.RtpStream;
-import com.optman.rtp.receiver.Sample;
-import com.optman.rtp.receiver.SampleHandler;
 import com.optman.rtp.receiver.UdpServer;
 
 import java.net.SocketException;
 
 public class UdpSinkPlayer implements Player {
-
     //private final static String TAG = "UdpSinkPlayer";
 
     private int videoReceivePort;
@@ -32,16 +29,13 @@ public class UdpSinkPlayer implements Player {
 
     private int sourceCount;
 
-
     public UdpSinkPlayer(int videoReceivePort, int audioReceivePort, VideoSurfaceView view, Handler handler, int sourceCount) {
-
         player = new SimplePlayer(view, handler, sourceCount);
 
         this.videoReceivePort = videoReceivePort;
         this.audioReceivePort = audioReceivePort;
         this.sourceCount = sourceCount;
     }
-
 
     public void setVideoFormat(MediaFormat format) {
         player.setVideoFormat(format);
@@ -55,7 +49,6 @@ public class UdpSinkPlayer implements Player {
     }
 
     public void start() {
-
         player.start();
 
         try {
@@ -63,11 +56,9 @@ public class UdpSinkPlayer implements Player {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-
     }
 
     public void stop() {
-
         stopRtp();
 
         player.stop();
@@ -75,37 +66,19 @@ public class UdpSinkPlayer implements Player {
     }
 
     void startRtp() throws SocketException {
+        videoStream = new RtpAvcStream(sample -> player.onVideoSample(sample), getStats());
 
-
-        videoStream = new RtpAvcStream(new SampleHandler() {
-
-            @Override
-            public void onSample(Sample sample) {
-                player.onVideoSample(sample);
-            }
-
-        }, getStats());
         videoReceiver = new UdpServer(videoReceivePort, videoStream);
         videoReceiver.open();
 
         if (sourceCount > 1) {
-
-            audioStream = new RtpAacStream(audioSampleRate, new SampleHandler() {
-
-                @Override
-                public void onSample(Sample sample) {
-                    player.onAudioSample(sample);
-                }
-
-            }, getStats());
+            audioStream = new RtpAacStream(audioSampleRate, sample -> player.onAudioSample(sample), getStats());
             audioReceiver = new UdpServer(audioReceivePort, audioStream);
             audioReceiver.open();
-
         }
     }
 
     void stopRtp() {
-
         if (videoStream != null) {
             videoStream.close();
             videoStream = null;
@@ -123,9 +96,7 @@ public class UdpSinkPlayer implements Player {
             audioReceiver.close();
             audioReceiver = null;
         }
-
     }
-
 
     @Override
     public void addVideoPacket(byte[] data, int dataSize) {
@@ -134,7 +105,6 @@ public class UdpSinkPlayer implements Player {
     @Override
     public void addAudioPacket(byte[] data, int dataSize) {
     }
-
 
     @Override
     public Statistics getStats() {
@@ -145,5 +115,4 @@ public class UdpSinkPlayer implements Player {
     public void setJitterBuffer(long timeUs) {
         player.setJitterBuffer(timeUs);
     }
-
 }

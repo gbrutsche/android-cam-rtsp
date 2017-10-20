@@ -6,10 +6,14 @@ import android.os.Handler;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.google.android.exoplayer.*;
-import com.google.android.exoplayer.ExoPlayer.*;
+import com.google.android.exoplayer.ExoPlaybackException;
+import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer.ExoPlayer.ExoPlayerComponent;
+import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.TrackRenderer;
+import com.google.android.exoplayer.VideoSurfaceView;
 
 public class RtpPlayer implements SurfaceHolder.Callback, ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener {
 
@@ -32,12 +36,10 @@ public class RtpPlayer implements SurfaceHolder.Callback, ExoPlayer.Listener, Me
     }
 
     public void prepare(RtpSampleSource... sources) {
-
         for (int i = 0; i < sources.length; i++) {
             RtpSampleSource source = sources[i];
             if (source.getFormat().mimeType.startsWith("video/")) {
-                renders[i] = new MediaCodecVideoTrackRenderer(source, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
-                                                              0, handler, this, 10);
+                renders[i] = new MediaCodecVideoTrackRenderer(source, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING, 0, handler, this, 10);
                 videoRenderer = renders[i];
             } else if (source.getFormat().mimeType.startsWith("audio/")) {
                 renders[i] = new MediaCodecAudioTrackRenderer(source, null, true);
@@ -49,7 +51,6 @@ public class RtpPlayer implements SurfaceHolder.Callback, ExoPlayer.Listener, Me
         player.prepare(renders);
 
         setSurface();
-
     }
 
     public void play() {
@@ -112,16 +113,20 @@ public class RtpPlayer implements SurfaceHolder.Callback, ExoPlayer.Listener, Me
     }
 
     @Override
+    public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
+
+    }
+
+    @Override
     public void onDroppedFrames(int count, long elapsed) {
         stats.renderDropframeCount += count;
     }
 
     @Override
-    public void onVideoSizeChanged(int width, int height) {
+    public void onVideoSizeChanged(int width, int height, float pixelWidthHeightRatio) {
     }
 
     @Override
     public void onDrawnToSurface(Surface surface) {
-
     }
 }

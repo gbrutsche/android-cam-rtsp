@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-
 public class RtpSampleSource implements SampleSource {
-
     private static final String TAG = "RtpSampleSource";
 
     private boolean formatSent = false;
@@ -50,8 +48,7 @@ public class RtpSampleSource implements SampleSource {
     }
 
     @Override
-    public synchronized boolean prepare() throws IOException {
-
+    public synchronized boolean prepare(long positionUs) throws IOException {
         return /*initializationData != null && */format != null;
     }
 
@@ -82,13 +79,11 @@ public class RtpSampleSource implements SampleSource {
     public synchronized int readData(int track, long playbackPositionUs,
                                      MediaFormatHolder formatHolder, SampleHolder sampleHolder,
                                      boolean onlyReadDiscontinuity) throws IOException {
-
         if (onlyReadDiscontinuity) {
             return NOTHING_READ;
         }
 
         if (!formatSent) {
-
             formatHolder.format = this.format;
             formatSent = true;
             return FORMAT_READ;
@@ -99,7 +94,6 @@ public class RtpSampleSource implements SampleSource {
 
 
         if (sampleHolder.data != null) {
-
             Sample sample = samples.poll();
             if (sample != null) {
                 sampleHolder.size = sample.data.length;
@@ -130,7 +124,5 @@ public class RtpSampleSource implements SampleSource {
 
     @Override
     public void release() {
-
     }
-
 }
