@@ -1,11 +1,11 @@
 package com.optman.RtspServer;
 
-import java.net.InetAddress;
-
 import com.optman.rtp.sender.RtpSocket;
 
+import java.net.InetAddress;
+
 public class RtpSession {
-	InetAddress host;
-	int port;
-	RtpSocket tcpSocket;	
+    InetAddress host;
+    int         port;
+    RtpSocket   tcpSocket;
 }
