@@ -23,19 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RtspServerActivitiy extends Activity implements Callback, StreamInfo {
-    private SurfaceView   surfaceView;
-    private SurfaceHolder surfaceHolder;
-    private MediaPlayer   mediaPlayer;
-    private RtspServer    svr;
+    private MediaPlayer mediaPlayer;
     private RtpSessionManager videoSessions = new RtpSessionManager();
     private RtpSessionManager audioSessions = new RtpSessionManager();
 
     private com.optman.rtp.receiver.RtpAvcStream videoReceiverStream;
-    private UdpServer                            videoReceiver;
     private com.optman.rtp.sender.RtpAvcStream   videoSenderStream;
 
     private com.optman.rtp.receiver.RtpAacStream audioReceiverStream;
-    private UdpServer                            audioReceiver;
     private com.optman.rtp.sender.RtpAacStream   audioSenderStream;
 
 
@@ -49,10 +44,9 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         getWindow().setFormat(PixelFormat.UNKNOWN);
-        surfaceView = findViewById(R.id.surfaceview);
-        surfaceHolder = surfaceView.getHolder();
+        SurfaceView   surfaceView   = findViewById(R.id.surfaceview);
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
 
         spspps.add(null);
@@ -60,11 +54,10 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
 
         startStatsTimer();
 
-        svr = new RtspServer(9554, videoSessions, audioSessions, this);
+        RtspServer svr = new RtspServer(9554, videoSessions, audioSessions, this);
         svr.start();
 
         startRtp();
-
 
 //        (new Thread(new Runnable(){
 //			@Override
@@ -74,7 +67,6 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
     }
 
     private void startRtp() {
-
         videoSenderStream = new com.optman.rtp.sender.RtpAvcStream(videoSessions);
 
         videoReceiverStream = new com.optman.rtp.receiver.RtpAvcStream(sample -> {
@@ -96,7 +88,7 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
             }
         }, st);
 
-        videoReceiver = new UdpServer(/*50000*/59526, videoReceiverStream);
+        UdpServer videoReceiver = new UdpServer(/*50000*/59526, videoReceiverStream);
         try {
             videoReceiver.open();
         } catch (SocketException e) {
@@ -112,7 +104,7 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
             }
         }, st);
 
-        audioReceiver = new UdpServer(40272, audioReceiverStream);
+        UdpServer audioReceiver = new UdpServer(40272, audioReceiverStream);
 
 
         try {
