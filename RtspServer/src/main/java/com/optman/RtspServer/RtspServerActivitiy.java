@@ -33,7 +33,6 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
     private com.optman.rtp.receiver.RtpAacStream audioReceiverStream;
     private com.optman.rtp.sender.RtpAacStream   audioSenderStream;
 
-
     private List<byte[]> spspps = new ArrayList<>();
 
     private Handler    statsHandler = new Handler();
@@ -42,7 +41,7 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_rtsp_server);
 
         getWindow().setFormat(PixelFormat.UNKNOWN);
         SurfaceView   surfaceView   = findViewById(R.id.surfaceview);
@@ -54,16 +53,12 @@ public class RtspServerActivitiy extends Activity implements Callback, StreamInf
 
         startStatsTimer();
 
-        RtspServer svr = new RtspServer(9554, videoSessions, audioSessions, this);
+        RtspServer svr = new RtspServer(getApplicationContext(), 9554, videoSessions, audioSessions, this);
         svr.start();
 
         startRtp();
 
-//        (new Thread(new Runnable(){
-//			@Override
-//			public void run() {
-//		        playMovie();
-//		}})).start();
+        //(new Thread(this::playMovie)).start();
     }
 
     private void startRtp() {

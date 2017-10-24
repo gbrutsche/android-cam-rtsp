@@ -1,6 +1,7 @@
 package com.optman.RtspServer;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -28,6 +29,7 @@ public class RtspServer {
     private final int    audioChannel     = 2;
     private final String audioConfig      = "1210";
     private final int        port;
+    private final String     localIp;
     private       StreamInfo stream;
 
     enum MethodName {
@@ -52,7 +54,8 @@ public class RtspServer {
         Socket      socket;
     }
 
-    public RtspServer(int port, RtpSessionManager videoSessions, RtpSessionManager audioSessions, StreamInfo stream) {
+    public RtspServer(Context context, int port, RtpSessionManager videoSessions, RtpSessionManager audioSessions, StreamInfo stream) {
+        localIp = RtspUtil.getLastInetAddress(context);
         this.port = port;
         this.videoSessions = videoSessions;
         this.audioSessions = audioSessions;
@@ -89,9 +92,7 @@ public class RtspServer {
         try {
             server.close();
             thread.join();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -163,7 +164,7 @@ public class RtspServer {
             line = reader.readLine();
         }
 
-        boolean result = false;
+        boolean result;
 
         switch (method) {
             case Options:
@@ -264,8 +265,6 @@ public class RtspServer {
     }
 
     private boolean handleDescribe(Map<String, String> headers, PrintWriter writer) {
-        String localIp = Utility.getLocalIpAddress();
-
         String           paramSets = "";
         Iterator<byte[]> iter      = stream.getSpsPps().iterator();
 

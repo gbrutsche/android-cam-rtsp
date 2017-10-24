@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class RtpAvcStream extends RtpStream {
-
-    //private final static String TAG = "AvcRtpStream";
+    //private final static String TAG = RtpAvcStream.class.getSimpleName();
 
     public RtpAvcStream(RtpSocket socket) {
         super(125, 90000, socket);
@@ -28,7 +27,6 @@ public class RtpAvcStream extends RtpStream {
     }
 
     private void createSingleUnit(byte[] data, int offset, int size, long timeUs) throws IOException {
-
         //Log.i(TAG, "single nalu  type:" +  (data[offset] & 0x1f));
 
         addPacket(data, offset, size, timeUs);
@@ -36,7 +34,6 @@ public class RtpAvcStream extends RtpStream {
 
 
     private void createFuA(byte[] data, int offset, int size, long timeUs) throws IOException {
-
         byte originHeader = data[offset++];
         size -= 1;
 
@@ -63,6 +60,5 @@ public class RtpAvcStream extends RtpStream {
 
             addPacket(new byte[]{indicator, naluHeader}, data, offset, read, timeUs);
         }
-
     }
 }
